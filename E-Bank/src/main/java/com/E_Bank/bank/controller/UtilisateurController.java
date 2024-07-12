@@ -1,5 +1,6 @@
 package com.E_Bank.bank.controller;
 
+import com.E_Bank.bank.Security.JwtAuth;
 import com.E_Bank.bank.model.Compte;
 import com.E_Bank.bank.model.Utillisateur;
 import com.E_Bank.bank.service.CompteService;
@@ -8,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,9 +30,8 @@ public class UtilisateurController {
     AuthenticationManager authenticationManager;
 
     @PostMapping("/saveUtilisateur")
-    public ResponseEntity<Utillisateur> createUtilisateur(@RequestBody Utillisateur utilisateur) {
-        Utillisateur savedUtilisateur = utilisateurService.saveUtilisateur(utilisateur);
-        return ResponseEntity.ok(savedUtilisateur);
+    public Utillisateur saveUtilisateur(@RequestBody Utillisateur utilisateur) {
+        return utilisateurService.saveUtilisateur(utilisateur);
     }
 
     @GetMapping("/getUtilisateur/{id}")
@@ -57,13 +59,14 @@ public class UtilisateurController {
         return utilisateurService.creerCompteUtilisateur(id, compte);
     }
 
-    @PostMapping("/user")
-    public ResponseEntity<?> createUser(@RequestBody Utillisateur user) {
-        try {
-            Utillisateur createdUser = utilisateurService.saveUtilisateur(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating user: " + e.getMessage());
-        }
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Utillisateur user) {
+        System.out.println("///////////////////"+user.getPassword()+"//////////////"+user.getUsername());
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
+        );
+        String token = JwtAuth.generateToken(user.getUsername());
+        return ResponseEntity.ok(token);
+
     }
 }

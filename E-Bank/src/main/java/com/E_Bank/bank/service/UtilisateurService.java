@@ -4,17 +4,14 @@ import com.E_Bank.bank.model.Compte;
 import com.E_Bank.bank.model.Utillisateur;
 import com.E_Bank.bank.repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import org.springframework.context.annotation.Lazy;
+
 
 @Service
-public class UtilisateurService implements UserDetailsService {
+public class UtilisateurService {
 
     @Autowired
     private UtilisateurRepository utilisateurRepository;
@@ -26,9 +23,9 @@ public class UtilisateurService implements UserDetailsService {
     private PasswordEncoder passwordEncoder;
 
     public Utillisateur saveUtilisateur(Utillisateur utilisateur) {
-        String hashedPassword = passwordEncoder.encode(utilisateur.getMotDePasse());
-        utilisateur.setMotDePasse(hashedPassword);
-        System.out.println("ana treaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaat");
+        String hashedPassword = passwordEncoder.encode(utilisateur.getPassword());
+        utilisateur.setPassword(hashedPassword);
+
         return utilisateurRepository.save(utilisateur);
     }
 
@@ -42,9 +39,9 @@ public class UtilisateurService implements UserDetailsService {
 
     public Utillisateur updateUtilisateur(int id, Utillisateur utilisateurDetails) {
         Utillisateur utilisateur = getUtilisateurById(id);
-        utilisateur.setNomUser(utilisateurDetails.getNomUser());
+        utilisateur.setUsername(utilisateurDetails.getUsername());
         utilisateur.setEmail(utilisateurDetails.getEmail());
-        utilisateur.setMotDePasse(utilisateurDetails.getMotDePasse());
+        utilisateur.setPassword(utilisateurDetails.getPassword());
         return utilisateurRepository.save(utilisateur);
     }
 
@@ -59,9 +56,4 @@ public class UtilisateurService implements UserDetailsService {
         return compteService.saveCompte(compte);
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Implémentez la logique pour charger l'utilisateur par nom d'utilisateur
-        return null;
-    }
 }

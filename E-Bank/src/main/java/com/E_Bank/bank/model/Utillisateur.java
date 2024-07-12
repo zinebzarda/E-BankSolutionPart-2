@@ -17,13 +17,13 @@ public class Utillisateur  {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idUtillisateur;
 
-    private String nomUser;
+    private String username;
 
 
     private String email;
 
 
-    private String motDePasse;
+    private String password;
 
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
     @JsonManagedReference
