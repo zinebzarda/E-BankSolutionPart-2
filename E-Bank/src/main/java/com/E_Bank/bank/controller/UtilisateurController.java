@@ -11,9 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -29,7 +31,7 @@ public class UtilisateurController {
     @Autowired
     AuthenticationManager authenticationManager;
 
-    @PostMapping("/saveUtilisateur")
+    @PostMapping("/signup")
     public Utillisateur saveUtilisateur(@RequestBody Utillisateur utilisateur) {
         return utilisateurService.saveUtilisateur(utilisateur);
     }
@@ -59,14 +61,32 @@ public class UtilisateurController {
         return utilisateurService.creerCompteUtilisateur(id, compte);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Utillisateur user) {
-        System.out.println("///////////////////"+user.getPassword()+"//////////////"+user.getUsername());
+//    @PostMapping("/login")
+//    public ResponseEntity<?> login(@RequestBody Utillisateur utilisateur) {
+//        System.out.println("///////////////////"+utilisateur.getPassword()+"//////////////"+utilisateur.getUsername());
+//        Authentication authentication = authenticationManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(utilisateur.getUsername(), utilisateur.getPassword())
+//        );
+//        String token = JwtAuth.generateToken(utilisateur.getUsername());
+//        return ResponseEntity.ok(token);
+//
+//    }
+@PostMapping("/login")
+public ResponseEntity<?> login(@Valid @RequestBody Utillisateur utilisateur) {
+    try {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
-        );
-        String token = JwtAuth.generateToken(user.getUsername());
-        return ResponseEntity.ok(token);
+                new UsernamePasswordAuthenticationToken(utilisateur.getUsername(), utilisateur.getPassword()));
 
+        if (authentication.isAuthenticated()) {
+            String token = JwtAuth.generateToken(utilisateur.getUsername());
+            return ResponseEntity.ok(token);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid login credentials");
+        }
+    } catch (UsernameNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found: " + e.getMessage());
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error authenticating user: " + e.getMessage());
     }
+}
 }

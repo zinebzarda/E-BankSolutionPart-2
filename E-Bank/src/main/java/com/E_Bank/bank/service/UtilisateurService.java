@@ -23,11 +23,14 @@ public class UtilisateurService {
     private PasswordEncoder passwordEncoder;
 
     public Utillisateur saveUtilisateur(Utillisateur utilisateur) {
-        String hashedPassword = passwordEncoder.encode(utilisateur.getPassword());
-        utilisateur.setPassword(hashedPassword);
-
+        String password = utilisateur.getPassword();
+        if (password != null) {
+            String hashedPassword = passwordEncoder.encode(password);
+            utilisateur.setPassword(hashedPassword);
+        }
         return utilisateurRepository.save(utilisateur);
     }
+
 
     public List<Utillisateur> getAllUtilisateurs() {
         return utilisateurRepository.findAll();

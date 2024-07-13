@@ -33,7 +33,7 @@ public class ConfigSecurity {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(expressionInterceptUrlRegistry ->
                         expressionInterceptUrlRegistry
-                                .requestMatchers("/Utilisateur/saveUtilisateur").permitAll()
+                                .requestMatchers("/Utilisateur/signup").permitAll()
                                 .requestMatchers("/Utilisateur/login").permitAll() // Permettre l'accès à l'endpoint /login
                                 .anyRequest().authenticated()
                 )
